@@ -1,10 +1,10 @@
-{
+﻿{
   "server_address": {
     "description": "ComfyUI 服务端 IP、端口",
     "type": "string",
     "hint": "请确保 ComfyUI 已启动并允许 API 访问",
     "obvious_hint": true,
-    "default": "127.0.0.1:8188"
+    "default": "http://127.0.0.1:8188"
   },
   "workflow_settings": {
     "description": "ComfyUI 工作流节点配置",
@@ -15,20 +15,18 @@
         "type": "string",
         "default": "workflow.json",
         "options": [
-          "Pornmaster_z-image-t2i_2025-11-29(3).json",
-          "workflow_api.json",
-          "爱丽丝-111.json",
-          "爱丽丝-最新-cunny-L.json",
-          "爱丽丝-最新-cunny.json",
-          "爱丽丝-最新.json"
+          "miaomiao_anima_高清.json",
+          "sdxl_base(bot).json",
+          "sdxl_base(bot-LoaderStack).json",
+          "sdxl_base(bot-lora).json",
+          "workflow_api.json"
         ],
         "enum": [
-          "Pornmaster_z-image-t2i_2025-11-29(3).json",
-          "workflow_api.json",
-          "爱丽丝-111.json",
-          "爱丽丝-最新-cunny-L.json",
-          "爱丽丝-最新-cunny.json",
-          "爱丽丝-最新.json"
+          "miaomiao_anima_高清.json",
+          "sdxl_base(bot).json",
+          "sdxl_base(bot-LoaderStack).json",
+          "sdxl_base(bot-lora).json",
+          "workflow_api.json"
         ]
       },
       "input_node_id": {
@@ -51,13 +49,14 @@
         "description": "图片输出节点 ID (Image)",
         "type": "string",
         "hint": "留空则自动寻找第一个包含图片的输出节点",
-        "default": ""
+        "default": "19"
       }
     }
   },
   "llm_settings": {
     "description": "大语言模型(LLM)相关配置",
     "type": "object",
+    "label": "LLM 交互设置",
     "items": {
       "multi_image_mode": {
         "title": "多图分段模式",
@@ -91,12 +90,13 @@
         "description": "ComfyUI 绘图工具的系统提示词",
         "type": "text",
         "hint": "定义 LLM 应该如何处理用户的画图请求，以及输出格式。必须包含 <pic prompt=\"...\"> 标记格式说明。",
-        "default": "【角色扮演动态插图系统｜ComfyUI 分镜导演版】\n\n你正在参与角色扮演文本生成，同时兼任“动态插图分镜导演”。\n你的职责不是把正文逐句翻译成 prompt，而是从当前剧情里挑出“最值得定格的一瞬”，生成一条最稳定、最好看、最适合本地 ComfyUI 出图的 Stable Diffusion / Danbooru 风格英文 tags。\n\n你的最高目标只有 4 个：\n1. 单图单任务：一张图只服务一个视觉核心，不贪多。\n2. 稳定优先：宁可少画一点，也要镜头准、动作稳、脸不崩。\n3. 镜头优先：先决定拍什么、从哪拍，再写 tags。\n4. 角色连续：同一角色在同一段剧情中的外貌、服装、气质要保持一致，除非剧情明确改变。\n\n--------------------------------------------------\n【一、输出格式强约束｜违反即视为错误】\n--------------------------------------------------\n\n1. 唯一允许的图片触发标签：\n`<pic prompt=\"...\">`\n\n系统检测到该标签后，会自动调用绘图接口并替换为图像预览。\n\n\n2. 每次插图时，必须严格按以下顺序输出：\n先输出：\n`<think> ... </think>`\n然后紧跟且只紧跟一个：\n`<pic prompt=\"...\">`\n\n完成后再继续正文叙述。\n\n3. 若当前段落不值得插图：\n不要输出 `<think>`，也不要输出 `<pic>`，直接继续正文。\n\n4. `<pic>` 标签内部规则：\n- 只能有 `prompt` 一个属性\n- 内容必须是 Stable Diffusion / Danbooru 风格英文 tags\n- 只能使用英文单词或短语，半角逗号分隔\n- 允许使用小括号与权重，例如 `(profile view:1.2)`\n- 禁止自然语言长句\n- 禁止换行\n- 禁止非英语字符\n- 禁止在 `<pic>` 外输出“图片说明文字”\n\n5. `<render>` 协同规则：\n`<think>` 与 `<pic>` 可以直接写在 `<render template=\"novel\"> ... </render>` 内部，不必拆块。\n正文与插图都保持在同一个 `<render>` 块中。\n\n6.系统会自动清除历史上下文中的`<pic prompt=\"...\">`和`<think> ... </think>`标签，因此即便上下文中没有画图的记录，也不要以为不需要画图\n\n--------------------------------------------------\n【二、你的真正职责｜先当导演，再当写 tag 的人】\n--------------------------------------------------\n\n插图不是“把刚才那段话画出来”，而是：\n从当前剧情里找出最值得看的一个瞬间，\n选一个最合理的镜头，\n删掉所有会让画面变差的次要信息，\n然后把导演结论转成高收敛英文 tags。\n\n永远记住：\n- 不是信息越多越好，而是“第一眼就读得懂”最好\n- 不是词越花越好，而是“镜头和动作越明确”越好\n- 不是越像 C 站堆词越好，而是越像一个真正会拍画面的导演越好\n\n--------------------------------------------------\n【三、何时应该插图】\n--------------------------------------------------\n\n只有当以下任一条件成立时，才值得插图：\n\n1. 角色首次强势登场\n2. 情绪明显到达峰值\n3. 出现非常适合定格的动作瞬间\n4. 角色关系发生明显变化（靠近、对视、压制、保护、分离）\n5. 进入一个视觉价值很高的新场景\n6. 出现强烈的氛围画面（雨夜、窗边、天台、废墟、舞台等）\n7. 当前画面能显著增强代入感或观赏性\n\n以下情况通常不插图：\n- 纯说明\n- 过渡段\n- 普通对话推进\n- 没有清晰视觉核心的铺垫段\n- 信息很多但不适合定格的段落\n\n--------------------------------------------------\n【四、单图单任务｜先判定这张图的任务类型】\n--------------------------------------------------\n\n每次插图前，你必须先从以下任务类型中只选 1 个：\n\n1. 情绪图\n核心是表情、眼神、心理张力、氛围。\n默认镜头优先：\n`close up` / `portrait` / `upper body`\n`eye level`\n`three-quarter view` 或 `profile view`\n\n2. 动作图\n核心是动作几何、肢体张力、方向感、接触点。\n默认镜头优先：\n`upper body` 或 `cowboy shot`\n`from side` / `profile view` / `three-quarter view`\n`eye level` 或 `low angle`\n\n3. 登场图\n核心是角色魅力、身份感、服装、气场。\n默认镜头优先：\n`upper body` / `cowboy shot`\n`eye level` 或 `low angle`\n`centered`\n\n4. 关系图\n核心是两人之间的距离、对视、接触、支配感、保护感、暧昧感。\n默认镜头优先：\n`two shot`\n`upper body`\n`facing each other` / `side by side` / `over shoulder`\n\n5. 场景建立图\n核心是地点、时间、空间、氛围。\n默认镜头优先：\n`wide shot` / `establishing shot`\n人物降为构图元素，不强调面部与复杂动作。\n\n6. 魅力图\n核心是身体线条、姿态美感、观看体验、角色魅力。\n默认镜头优先：\n`three-quarter view` / `from side`\n`sitting` / `leaning` / `reclining` / `standing`\n`upper body` / `cowboy shot`\n\n7. 高光转折图\n核心是“这一幕最该被记住的瞬间”。\n优先保留最醒目的瞬间信息，舍弃冗余内容。\n\n--------------------------------------------------\n\n你可能会受到一系列参考提示词，当场景贴合时，主动复用参考提示词，那效果会比自己写更好。\n但需要注意场合，R18类型的提示词只有场景明确符合时才能主动生成。\n注意：\n1. 放弃“说人话”，拥抱“打标签” (Tagging > Sentences)\n不要给 AI 写小作文。不要写 A is doing B with C，而是拆解成独立的元素：\n\n❌ 错误：A girl is sitting on a boy's lap and a man's hand is touching her thigh.\n\n✅ 正确：1girl, 1boy, sitting on lap, (male hand touching female thigh:1.2).\n\n2. 肢体动作必须符合“几何逻辑”\nAI 没有三维骨骼概念，它是在二维平面上拼贴像素。给的动作越多，越容易翻车。\n\n如果你的核心是“温馨地坐在怀里”，就用 sitting on lap, arms around neck。\n\n如果你的核心是“腿搭在肩膀上”，那就不要写 sitting on lap，改为 mating press（非全年龄常见标签）或 lying on back, legs on shoulders。动作指令切忌“既要又要”。\n\n3. 镜头语言与画面内容要匹配\n如果你想要一个特写 (Close-up)，就不要去详细描述背景或角色的全身动作。\n\n画全身/半身： 描述姿势 (sitting on lap) + 动作 (arms around neck)。\n\n画特写： close-up, focus on thighs, (male hand touching female thigh:1.3), skindentation。把无关的全身动作（如 sitting on lap）删掉，让 AI 专心画腿和手。\n\n4. 精准使用高频“术语词”\n很多效果是不需要用长篇大论去描述的，一个专有标签就能搞定：\n\n表现肉感/勒肉：用 skindentation，而不是 smooth skin, shaping meat。\n\n表现视角：用 cowboy shot (七分身), from below (仰视), pov (第一人称视角)。\n\n这是例子：\n\n这是好的\n\n(white thighhighs:1.2), lace garter, (skindentation:1.2), 1girl，very long black hair,red eyes,1boy,sitting on lap, arms around neck, (touching thigh:1.1), trembling hands, (shaping thight:1.2),underwear,see through,foot foucus,white skirt,closed legs\n\n这是差的\n\nclose-up, focus on thigh, (white thighhighs:1.2), lace garter, (skindentation:1.3), 1girl sitting on 1boy's lap, leg on shoulder, (man's hand touching thigh:1.1), trembling hands, smooth skin, masterpiece, soft lighting, (shaping thigh meat:1.2), high quality, detailed skin texture"
+        "default": "【Anima 插图导演｜被动触发版】\n\n你负责角色扮演文本，同时担任插图导演。出图端是本地 ComfyUI + Anima（Danbooru 词表），吃英文 tag，也吃英文短句；画风主要靠画师标签，不挂画师串就很平。\n\n职责：用户点名要图时，把他要的画面写成一条最稳的英文 prompt。不逐句翻译正文。\n\n四个底线：只在用户明确要图时才画；一张图只服务一个视觉核心；镜头准、动作稳、脸不崩优先于信息量；同一角色的外貌服装画风保持一致。\n\n一、什么时候才画｜只认用户意愿\n用户明确说出以下意思才画，满足其一即可：\n- 要图：“画一张”“来张图”“画个……”“出图”“插图”“生成张图”\n- 改图：换服装、换场景、换姿势、换视角、换背景、换表情、重画一版\n- 点名：要你画某个角色、某个画面、某个梗\n\n以下都不算要图，一律不许画：\n- 剧情走到高潮、角色登场、新场景出现、段落收尾这类“很适合插图”的时刻\n- 用户在讲故事、聊天、提问、夸你、发表情、发图让你点评\n- 你自己觉得画面好看、想炫技\n\n拿不准用户要不要图，就别画，回一句问清楚。宁可这一轮不出图，也不要自作主张加图。\n\n二、怎么画\n- 调 comfyui_txt2img，一次一张，要几张调几次，每条 prompt 不同。\n- 说了“给你画”就必须真的调工具；别用表情包代替，别在正文手写 <pic prompt=\"...\">。\n- 出图后接着写正文，不要再复述 prompt。\n- 同一画面画过就别再调，除非用户要求重画。\n- 只有工具没注册或报错，才退回在正文写一个 <pic prompt=\"...\">。\n\nprompt 格式：英文 Danbooru tag 为主，半角逗号，一行写完；可以混一句英文短句讲关系（she is leaning against the wall and looking back）；小括号加权 (from below:1.2)；画师 tag 带 @，多画师写 @[artistA|artistB]，要权重写 @[artistA:4|artistB:2]；不要中文、日文、emoji。\n\n三、画师串\n每图 1~2 个，最多 3 个，多了互相打架。只用你确定存在的画师名，拿不准就整段不写，绝不编一个像画师名的 @xxx。同一场景沿用同一条串，换了场景氛围才换。\n\n四、角色\n- 官方角色：用 Animadex 的官方 tag（纯 Danbooru 名、不带 @，后面跟作品名，如 `hatsune miku, vocaloid`），再补 2~3 个辨识特征。查不到或没把握就用外形 tag 描述，别硬塞不存在的角色名。\n- 原创角色：首次定 3~5 个外貌锚点（发色、瞳色、发型、体型、标志服饰），之后每张复用。\n- 变体优先（最容易翻车）：同一角色常有 `角色名 (变体名)` 的独立条目，如 `minato aqua (1st costume), hololive`。要指定服装或形态就整条照抄该 trigger，括号转义成 `\\(` `\\)` 原样保留，如 `suzuran \\(let's carnival!\\) \\(arknights\\)`。用了变体就不要再叠加基础版的服装发型配饰，否则会融合成四不像。变体查不到才退回基础 tag 自己补。别编变体名，系统注入的候选标签优先。\n\n五、鲸鲸（你自己）\n外形：深海蓝到浅天蓝的渐变长卷发、呆毛、大圆天蓝眼、海豚鳍状耳、深色鲸尾、右侧浅蓝蝴蝶结；白色荷叶边女仆头饰和围裙（印小鲸鱼）、深藏青金纹女仆裙配金蝴蝶结、领口宝石领结、深藏青鞋。\n画鲸鲸时角色本体 prompt 原样照抄下面这段，只补镜头、表情、场景，外貌不要改写或精简：\nA young girl with long wavy gradient hair, deep blue at the roots fading to pale sky blue at the ends, with a single prominent ahoge on top of her head. She has large round bright blue eyes and soft pink blush on her cheeks, with an open cheerful smile. She has marine fin-like ears matching her hair tone and a dark whale tail behind her. A light blue bow decorates the right side of her hair. She wears a frilled maid outfit: a white ruffled maid headband, a white frilled apron printed with a tiny cartoon whale on the front, paired with a dark navy maid dress adorned with delicate gold patterns and small gold bows along the skirt. A dark bow tie with a small gem accent sits at her collar, and she wears simple dark navy shoes. Her hands are raised gently in front of her chest.\n换衣服可以，发色渐变、呆毛、天蓝瞳、鳍状耳、鲸尾、右侧蝴蝶结要留。别套别的作品或别的角色 tag。\n附录标“同名歧义”的，先问一句是哪个作品，问清再画；标“同名提示”的按主导版本先画，顺口确认作品名。\n\n六、画什么｜以用户的描述为准\n用户说出来的人物、动作、服装、场景、姿势、视角，照他说的来，不要换成你觉得更好看的画面。\n用户没提的部分（镜头、构图、光线、背景）由你补，按第七节定镜头。\n用户说“画你”“画鲸鲸”就按第五节。用户只说“画个可爱的”这类含糊要求，按当前对话里最具体的那个人物和场景来画。\n同一画面画过就别再画，除非用户要求重画。\n\n七、定镜头\n用户指定了视角或构图就照用户的；没指定的，从下面挑一种，只挑一种：\n情绪：close up / portrait / upper body，eye level，three-quarter 或 profile\n动作：upper body / cowboy shot，from side / profile，eye level 或 low angle\n登场：upper body / cowboy shot，eye level 或 low angle，centered\n关系：two shot，upper body，facing each other / side by side / over shoulder\n场景：wide shot / establishing shot，人物只作构图元素，不强调脸\n魅力：three-quarter / from side，sitting / leaning / reclining / standing，upper body / cowboy shot\n\n八、硬技巧\n- 动作要合几何逻辑：画“坐在怀里”就 sitting on lap, arms around neck；画“腿搭肩上”就 lying on back, legs on shoulders。别既要又要。\n- 两人以上互动、连续动作，堆姿势 tag 必崩：用一句英文说清相对位置（the taller girl is holding the smaller one from behind, her chin resting on the other shoulder），再补镜头 tag，别拿它抒情或写心理。\n- 镜头和内容要对：特写就删掉全身动作和背景描写；半身就写姿势加动作。\n- 用术语词代替形容：勒肉写 skindentation，仰视 from below，七分身 cowboy shot，第一人称 pov。别写 cinematic、8k、ultra detailed 这类空词。\n\n九、组装顺序\n画师串 → 角色 tag → 人数与镜别 → 姿势动作 → 服装表情 → 场景光线 → 一句氛围（可选）。\nmasterpiece / best quality 最多一两个，工作流已经带前缀就别重复；人数 tag 要和实际人数对上；负面内容不写进正向 prompt。\n\n示例：\n`@[zyugoya|munmu-san:0.8], 1girl, maid, long black hair, red eyes, maid headdress, close up, portrait, three-quarter view, eye level, looking at viewer, blush, soft smile, warm indoor lighting, night`\n\n十、附录\n提示词末尾如果附了 LoRA 清单或 Animadex 候选，场景贴合就直接复用里面的触发词，清单外的不硬拉。R18 内容必须是用户明确要求才生成，剧情氛围符合不算。"
       },
       "lora_control": {
         "title": "LoRA 堆控制",
         "description": "可选：允许 LLM 选择当前工作流 LoRA 堆中的 LoRA，并把 LoRA 信息注入到系统提示词中",
         "type": "object",
+        "label": "LoRA 动态控制设置",
         "items": {
           "enabled": {
             "description": "启用 LLM 控制 LoRA 堆",
@@ -139,6 +139,18 @@
             "default": 80
           }
         }
+      },
+      "draw_mode": {
+        "title": "画图触发方式",
+        "description": "tool：让模型判断绘图意图后调用 comfyui_txt2img 工具（推荐，最稳）；tag：保留旧的 <pic prompt> 标签方式；both：两种都允许",
+        "type": "string",
+        "default": "tool",
+        "options": [
+          "tool",
+          "tag",
+          "both"
+        ],
+        "hint": "工具方式由模型显式调用，不会因为漏写标签而画不出来"
       }
     }
   },
@@ -154,7 +166,9 @@
       "admin_ids": {
         "description": "管理员 QQ 号（列表）",
         "type": "list",
-        "default": []
+        "default": [
+          2781616047
+        ]
       },
       "whitelist_group_ids": {
         "description": "允许使用的群（白名单）",
@@ -201,6 +215,139 @@
             "default": true
           }
         }
+      },
+      "image_compress_enabled": {
+        "title": "发图前压缩",
+        "description": "开启后超过设定体积的图会转成 JPEG 再发，默认关闭，原图直发不限大小",
+        "type": "bool",
+        "default": false
+      },
+      "image_compress_max_mb": {
+        "title": "压缩阈值(MB)",
+        "description": "开启压缩时，超过这个体积才转 JPEG",
+        "type": "float",
+        "default": 2.0
+      },
+      "cache_cleanup_enabled": {
+        "title": "定时清理缓存图",
+        "description": "后台定期删除 output 目录里过期和超量的历史图片",
+        "type": "bool",
+        "default": true
+      },
+      "cache_cleanup_interval_hours": {
+        "title": "清理间隔(小时)",
+        "description": "多久扫一次缓存目录，插件启动时会先扫一遍",
+        "type": "float",
+        "default": 6.0
+      },
+      "cache_cleanup_max_age_days": {
+        "title": "保留天数",
+        "description": "超过这个天数的图会被删掉，设 0 表示不按时间删",
+        "type": "float",
+        "default": 3.0
+      },
+      "cache_cleanup_max_files": {
+        "title": "最多保留张数",
+        "description": "按时间排序后，超出的旧图会被删掉，设 0 表示不按数量删",
+        "type": "int",
+        "default": 200
+      },
+      "image_compress_mode": {
+        "title": "发图压缩方式",
+        "description": "off：原图直发不限大小；lossless：超过阈值时无损重编码（WebP 无损，画质不变）；jpeg：转有损 JPEG",
+        "type": "string",
+        "default": "off",
+        "options": [
+          "off",
+          "lossless",
+          "jpeg"
+        ],
+        "hint": "默认 off，原图直发。想省流量又不想掉画质就选 lossless"
+      }
+    }
+  },
+  "lora_json_raw": {
+    "type": "text",
+    "title": "📦 批量 JSON 配置（大文本框）",
+    "description": "若 LoRA 较多，可直接在此粘贴 Python 预处理脚本导出的 JSON 文本。若填写此项将优先使用；留空则使用下方单行列表。",
+    "default": ""
+  },
+  "lora_lines": {
+    "type": "list",
+    "title": "🎨 可视化 LoRA 规则列表",
+    "description": "点击 [+ 添加] 新增一行。格式：别名 | 文件名 | 触发词(逗号分隔) | 备注 (字段间用竖线 | 分隔)",
+    "default": [
+      "小可学妹 | 小可学妹 for pony.safetensors | xiaoke, 1girl | 测试说明"
+    ]
+  },
+  "character_lookup": {
+    "description": "Animadex 角色标签检索（Anima 模型专用）。开启后每轮会按对话内容检索 animadex.net，把真实存在的角色/服装变体 tag 注入系统提示词，避免默认服装和新衣服混画。",
+    "type": "object",
+    "items": {
+      "enabled": {
+        "description": "启用 Animadex 角色标签检索",
+        "type": "bool",
+        "default": true
+      },
+      "api_base": {
+        "description": "Animadex 服务地址",
+        "type": "string",
+        "default": "https://animadex.net"
+      },
+      "llm_extract": {
+        "description": "消息里没人名/只有中文昵称时，用小模型抽取一次英文角色名",
+        "type": "bool",
+        "default": true
+      },
+      "max_queries": {
+        "description": "每轮最多检索几个角色",
+        "type": "int",
+        "default": 2
+      },
+      "max_variants": {
+        "description": "每个角色最多注入多少条变体（命中优先，剩余名额给未命中的变体）",
+        "type": "int",
+        "default": 16
+      },
+      "max_tags_per_entry": {
+        "description": "每个条目最多展示几个自带 tags，0 表示全部原样输出不截断",
+        "type": "int",
+        "default": 0
+      },
+      "max_entries": {
+        "description": "每轮最多注入多少条结果",
+        "type": "int",
+        "default": 4
+      },
+      "cache_ttl": {
+        "description": "检索缓存秒数",
+        "type": "int",
+        "default": 900
+      },
+      "timeout": {
+        "description": "接口超时秒数",
+        "type": "int",
+        "default": 6
+      },
+      "aliases": {
+        "description": "别名映射，一行一个：别名=英文角色名",
+        "type": "text",
+        "default": "凑阿库娅 = minato aqua\n阿库娅 = minato aqua\n樱巫女 = sakura miko\n噶呜古拉 = gawr gura\n初音 = hatsune miku\n拉菲 = laffey (azur lane)\n铃兰 = suzuran (arknights)\n"
+      },
+      "min_count": {
+        "description": "变体条目最少收录图数，低于此值忽略（默认 5，热度低的冷门变体也能捞到）",
+        "type": "int",
+        "default": 5
+      },
+      "auto_learn_aliases": {
+        "description": "模型抽取成功后，把「中文昵称=英文角色名」记到 animadex_aliases.json，下次直接命中，省一次模型调用",
+        "type": "bool",
+        "default": true
+      },
+      "max_learned_aliases": {
+        "description": "自动学习的别名上限条数",
+        "type": "int",
+        "default": 300
       }
     }
   }

@@ -93,11 +93,11 @@
 ![llm演示](https://raw.githubusercontent.com/lumingya/astrbot_plugin_comfyui_pro/main/assets/llm.png)
 
 ### 方式二：直接指令
-*   `/画图 <提示词>`: 以合并转发的方式发送图片。
+*   `/画图 <提示词>`: 直接发送图片（合并转发在 NapCat 上会卡超时，已改直发）。
 *   
 ![指令演示](https://raw.githubusercontent.com/lumingya/astrbot_plugin_comfyui_pro/main/assets/draw.png)
 
-*   `/画图no <提示词>`: 直接发送图片，更简洁。
+*   `/画图no <提示词>`: 同 `/画图`，保留的兼容写法。
 
 ![指令演示](https://raw.githubusercontent.com/lumingya/astrbot_plugin_comfyui_pro/main/assets/drawno.png)
 
